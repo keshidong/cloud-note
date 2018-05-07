@@ -5,38 +5,48 @@
 
 "use strict";
 
-var NoteList = function(text) {
-    var list = [];
+var NoteItem = function(text) {
     if (text) {
-        var objList = JSON.parse(text);
-        objList.forEach(function (index, el) {
-            list.push(el);
-        });
+        var obj = JSON.parse(text);
+        this.title = obj.title;
+        this.content = obj.content;
+        this.date = obj.date;
+        this.author = obj.author;
+    } else {
+        this.title = "";
+        this.content = "";
+        this.date = "";
+        this.author = "";
     }
-    this.list = list;
-}
+};
 
-NoteList.prototype = {
+NoteItem.prototype = {
     toString: function () {
-        // return array string
-        return JSON.stringify(this.list);
+        return JSON.stringify(this);
     }
 };
 
 var NoteBook = function () {
     LocalContractStorage.defineMapProperty(this, "repo", {
         parse: function (text) {
-            return new NoteList(text).list;
+            return new NoteItem(text);
         },
         stringify: function (o) {
             return o.toString();
+        }
+    });
+    LocalContractStorage.defineMapProperty(this, "addr", {
+        parse: function (str) {
+            return new BigNumber(str);
+        },
+        stringify: function (obj) {
+            return obj.toString();
         }
     });
 };
 
 NoteBook.prototype = {
     init: function () {
-        // todo
     },
 
     save: function (title, content, date, author) {
@@ -46,30 +56,35 @@ NoteBook.prototype = {
         date = date.trim();
         author = author.trim();
 
-        if (title.length > 64 || content.length > 1024){
-            throw new Error("title / content exceed limit length");
-        }
 
         var from = Blockchain.transaction.from;
-        var list = this.repo.get(from);
-
-        if (!list) {
-            list = [];
+        var size = this.addr.get(from);
+        if (!size) {
+            size = 0;
         }
+        size += 1;
+        this.addr.put(from, size);
 
-        list.push({
-            title: title,
-            content: content,
-            date: date,
-            author: author
-        });
-
-        this.repo.put(from, list);
+        var key = from + size.toString();
+        var noteItem = new NoteItem();
+        noteItem.title = title;
+        noteItem.content = content;
+        noteItem.date = date;
+        noteItem.author = author;
+        this.repo.put(key, noteItem);
     },
 
     get: function () {
         var from = Blockchain.transaction.from;
-        return this.repo.get(from);
+        var size = this.addr.get(from);
+        var list = [];
+        for (var i = 1; i <= size; i ++) {
+            var key = from + i.toString();
+            var noteItem = this.repo.get(key);
+            list.push(noteItem);
+        }
+        return list;
     }
 };
+
 module.exports = NoteBook;
