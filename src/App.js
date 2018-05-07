@@ -12,17 +12,11 @@ import { fade } from 'material-ui/utils/colorManipulator';
 import SubmitNote from './components/SubmitNote';
 import NoteRetrieval from './components/NoteRetrieval';
 import NebPay from './libs/nebPay';
-import { Neb, HttpRequest } from 'nebulas';
 import AppInfo from './components/AppInfo';
 import config from './config';
 
-
-const neb = new Neb();
 const nebPay = new NebPay();
-const { contact_address, contact_host } = config;
-// neb.setRequest(new HttpRequest("https://testnet.nebulas.io"));
-
-neb.setRequest(new HttpRequest(contact_host));
+const { contact_address } = config;
 
 const muiTheme = getMuiTheme({
     palette: {
