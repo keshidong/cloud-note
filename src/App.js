@@ -13,6 +13,7 @@ import SubmitNote from './components/SubmitNote';
 import SendTransactionConfirm from './components/SendTransactionConfirm';
 import NoteRetrieval from './components/NoteRetrieval';
 import { Neb, HttpRequest } from 'nebulas';
+import AppInfo from './components/AppInfo';
 import config from './config';
 
 
@@ -170,7 +171,7 @@ class App extends Component {
                         />
                     </Tab>
                 </Tabs>
-
+                <AppInfo />
             </MuiThemeProvider>
         )
     }

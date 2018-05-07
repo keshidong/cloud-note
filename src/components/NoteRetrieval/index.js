@@ -7,11 +7,11 @@ class NoteRetrieval extends Component {
     render() {
         return (
             <div style={{ marginTop: '40px' }}>
-                {
-                    this.props.list.length !== 0
-                        ? <NoteList list={this.props.list} />
-                        : <RaisedButton label="Retrieval NOW" onClick={this.props.onRetrieval}/>
-                }
+                <NoteList list={this.props.list} />
+
+                <div style={{ textAlign: 'center'}}>
+                    <RaisedButton label="Retrieval NOW" onClick={this.props.onRetrieval}/>
+                </div>
             </div>
         );
     }
