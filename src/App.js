@@ -39,13 +39,12 @@ const muiTheme = getMuiTheme({
 
 class App extends Component {
     state = {
-        noteList: [],
     }
     handleSubmitNote = ({ title, content }) => {
         nebPay.call(contact_address, 0, "save", JSON.stringify([title, content, new Date().toString(), ""]),
             {
                 qrcode: {
-                    showQRCode: true,
+                    showQRCode: false,
                 },
                 //set listener for extension transaction result
                 listener: (resp) => {
@@ -55,18 +54,18 @@ class App extends Component {
         );
     }
     handleRetrieval = () => {
-        nebPay.simulateCall(contact_address, 0, 'get', '', {
-            qrcode: {
-                showQRCode: true
-            },
-            listener: (res) => {
-                console.log(res);
-                const list = JSON.parse(res.result).filter((el) => (el));
-                this.setState({
-                    noteList: list,
-                });
-            }
-        });
+        return new Promise((resolve) => {
+            nebPay.simulateCall(contact_address, 0, 'get', '', {
+                qrcode: {
+                    showQRCode: false
+                },
+                listener: (res) => {
+                    const list = JSON.parse(res.result).filter((el) => (el));
+                    resolve(list);
+                }
+            });
+        })
+
     }
     render() {
         return (
@@ -95,7 +94,6 @@ class App extends Component {
                         label="Note Retrieval"
                     >
                         <NoteRetrieval
-                            list={this.state.noteList}
                             onRetrieval={this.handleRetrieval}
                         />
                     </Tab>
